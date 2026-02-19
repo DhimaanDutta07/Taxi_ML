@@ -1,18 +1,16 @@
 stages:
-  process:
-    cmd: python -m src.data.clean
+  clean:
+    cmd: python -c "import os, pandas as pd; from src.data.clean import DataCleaner; os.makedirs('data/processed', exist_ok=True); df=pd.read_csv('data/raw/taxi_fare_synth_50k.csv'); df=DataCleaner(df).clean(); df.to_csv('data/processed/taxi_cleaned.csv', index=False)"
     deps:
       - src/data/clean.py
-      - src/core/config.py
       - data/raw/taxi_fare_synth_50k.csv
     outs:
       - data/processed/taxi_cleaned.csv
 
   features:
-    cmd: python -m src.features.build
+    cmd: python -c "import os, pandas as pd; from src.features.build import FeatureBuilder; os.makedirs('data/processed', exist_ok=True); df=pd.read_csv('data/processed/taxi_cleaned.csv'); df=FeatureBuilder().build(df); df.to_csv('data/processed/taxi_featured.csv', index=False)"
     deps:
       - src/features/build.py
-      - src/core/config.py
       - data/processed/taxi_cleaned.csv
     outs:
       - data/processed/taxi_featured.csv
@@ -21,11 +19,23 @@ stages:
     cmd: python main.py
     deps:
       - main.py
-      - src
+      - src/core/config.py
+      - src/data/ingest.py
+      - src/data/clean.py
+      - src/data/split.py
+      - src/features/build.py
+      - src/model/trainer.py
+      - src/model/models.py
+      - src/model/preprocessor.py
+      - src/model/evaluate.py
+      - src/model/tune.py
+      - src/explain/shap_report.py
+      - src/monitoring/evidently_report.py
+      - src/storage/s3_store.py
       - data/processed/taxi_featured.csv
     outs:
       - artifacts/model/model.pkl
-      - artifacts/metrics
+      - artifacts/shap/summary.png
+      - artifacts/monitoring/evidently_report.html
       - artifacts/graphs
-      - artifacts/shap
-      - artifacts/monitoring
+      - artifacts/metrics

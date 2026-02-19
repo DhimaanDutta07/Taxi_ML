@@ -1,0 +1,42 @@
+schema: '2.0'
+stages:
+  clean:
+    cmd: python -c "import os, pandas as pd; from src.data.clean import 
+      DataCleaner; os.makedirs('data/processed', exist_ok=True); 
+      df=pd.read_csv('data/raw/taxi_fare_synth_50k.csv'); 
+      df=DataCleaner(df).clean(); df.to_csv('data/processed/taxi_cleaned.csv', 
+      index=False)"
+    deps:
+    - path: data/raw/taxi_fare_synth_50k.csv
+      hash: md5
+      md5: 614e87a71712771e43f4a47f556f2cb9
+      size: 6019948
+    - path: src/data/clean.py
+      hash: md5
+      md5: 9f5a4c236dbcfb75820a854b7a4d3be4
+      size: 789
+    outs:
+    - path: data/processed/taxi_cleaned.csv
+      hash: md5
+      md5: 769203b299cf90bc5c38f1a95f35890f
+      size: 2667495
+  features:
+    cmd: python -c "import os, pandas as pd; from src.features.build import 
+      FeatureBuilder; os.makedirs('data/processed', exist_ok=True); 
+      df=pd.read_csv('data/processed/taxi_cleaned.csv'); 
+      df=FeatureBuilder().build(df); 
+      df.to_csv('data/processed/taxi_featured.csv', index=False)"
+    deps:
+    - path: data/processed/taxi_cleaned.csv
+      hash: md5
+      md5: 769203b299cf90bc5c38f1a95f35890f
+      size: 2667495
+    - path: src/features/build.py
+      hash: md5
+      md5: 9b5f8050c121b04bf255fe84b03e80d8
+      size: 1420
+    outs:
+    - path: data/processed/taxi_featured.csv
+      hash: md5
+      md5: c8fdbb7442a397f4f9f7c6cd8397cf77
+      size: 5818243
