@@ -17,5 +17,8 @@ CFG = {
 
     "curr_path":"data/processed/taxi_cleaned.csv",
     "ref_path":"data/processed/taxi_cleaned.csv",
-    "evidently_path":"artifacts/monitoring/evidently_report.html"
+    "evidently_path":"artifacts/monitoring/evidently_report.html",
+    "use_localstack": True,
+    "s3_endpoint": "http://localhost:4566",
+    "s3_bucket": "dvc-bucket",
 }
