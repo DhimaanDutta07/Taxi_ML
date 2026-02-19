@@ -1,0 +1,8 @@
+[core]
+    remote = storage
+['remote "storage"']
+    url = s3://dvc-bucket/dvcstore
+    endpointurl = http://localhost:4566
+    access_key_id = test
+    secret_access_key = test
+    region = us-east-1
