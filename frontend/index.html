@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Taxi Fare Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        input, select {
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            width: 100%;
+        }
+
+        label {
+            font-size: 13px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            width: 100%;
+            background: #3b82f6;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #111827;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Taxi Fare Prediction</h2>
+
+    <form id="form">
+        <div class="grid">
+
+            <div>
+                <label>Pickup Datetime</label>
+                <input type="text" name="pickup_datetime" value="2025-05-28 13:46:26" required>
+            </div>
+
+            <div>
+                <label>Passenger Count</label>
+                <input type="number" name="passenger_count" value="2">
+            </div>
+
+            <div>
+                <label>Rate Code</label>
+                <select name="rate_code">
+                    <option value="standard">standard</option>
+                    <option value="airport">airport</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Payment Type</label>
+                <select name="payment_type">
+                    <option value="card">card</option>
+                    <option value="cash">cash</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Trip Distance (km)</label>
+                <input type="number" step="0.01" name="trip_distance_km" value="2.9">
+            </div>
+
+            <div>
+                <label>Trip Duration (min)</label>
+                <input type="number" step="0.1" name="trip_duration_min" value="11.2">
+            </div>
+
+            <div>
+                <label>Total Amount</label>
+                <input type="number" step="0.01" name="total_amount" value="14.25">
+            </div>
+
+            <div>
+                <label>Pickup Hour</label>
+                <input type="number" name="pickup_hour" value="13">
+            </div>
+
+            <div>
+                <label>Car Type</label>
+                <select name="car_type">
+                    <option value="4_seater">4_seater</option>
+                    <option value="6_seater">6_seater</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Is Airport</label>
+                <select name="is_airport">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Is Outer Borough</label>
+                <select name="is_outer_borough">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Distance Type</label>
+                <select name="distance_type">
+                    <option value="short">short</option>
+                    <option value="medium">medium</option>
+                    <option value="long">long</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Trip Duration Hours</label>
+                <input type="number" step="0.01" name="trip_duration_hours" value="0.18">
+            </div>
+
+            <div>
+                <label>Duration Type</label>
+                <select name="duration_type">
+                    <option value="short">short</option>
+                    <option value="medium">medium</option>
+                    <option value="long">long</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Is Long Trip</label>
+                <select name="is_long_trip">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Average Speed (km/h)</label>
+                <input type="number" step="0.01" name="avg_speed_kmh" value="15.5">
+            </div>
+
+            <div>
+                <label>Is Night Time</label>
+                <select name="is_night_time">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <div class="result" id="result" style="display:none;"></div>
+</div>
+
+<script>
+    const BASE_URL = "http://localhost:8000";
+
+    const form = document.getElementById("form");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const payload = {};
+
+        formData.forEach((value, key) => {
+            if (!isNaN(value) && value !== "") {
+                payload[key] = Number(value);
+            } else {
+                payload[key] = value;
+            }
+        });
+
+        try {
+            const response = await fetch(BASE_URL + "/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                resultDiv.style.display = "block";
+                resultDiv.innerHTML = "<h3>Prediction: ₹ " + data.prediction.toFixed(2) + "</h3>";
+            } else {
+                resultDiv.style.display = "block";
+                resultDiv.innerHTML = "<h3>Error:</h3><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+            }
+
+        } catch (err) {
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = "<h3>Server not reachable</h3>";
+        }
+    });
+</script>
+
+</body>
+</html>
