@@ -1,5 +1,67 @@
-artifacts/model/model.pkl
-artifacts/shap/summary.png
-artifacts/monitoring/evidently_report.html
-artifacts/graphs
-artifacts/metrics
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Logs
+*.log
+
+# =========================
+# DVC
+# =========================
+# Data files (tracked by DVC, not Git)
+data/raw/*
+data/processed/*
+artifacts/*
+mlruns/
+
+# DVC internal temp
+.dvc/tmp/
+
+# =========================
+# MLFLOW
+# =========================
+mlflow.db
+
+# =========================
+# LOCALSTACK
+# =========================
+.localstack/
+localstack_data/
+
+# =========================
+# DOCKER
+# =========================
+*.tar
+
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# EDITORS
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
