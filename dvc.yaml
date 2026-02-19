@@ -1,0 +1,31 @@
+stages:
+  process:
+    cmd: python -m src.data.clean
+    deps:
+      - src/data/clean.py
+      - src/core/config.py
+      - data/raw/taxi_fare_synth_50k.csv
+    outs:
+      - data/processed/taxi_cleaned.csv
+
+  features:
+    cmd: python -m src.features.build
+    deps:
+      - src/features/build.py
+      - src/core/config.py
+      - data/processed/taxi_cleaned.csv
+    outs:
+      - data/processed/taxi_featured.csv
+
+  train:
+    cmd: python main.py
+    deps:
+      - main.py
+      - src
+      - data/processed/taxi_featured.csv
+    outs:
+      - artifacts/model/model.pkl
+      - artifacts/metrics
+      - artifacts/graphs
+      - artifacts/shap
+      - artifacts/monitoring
