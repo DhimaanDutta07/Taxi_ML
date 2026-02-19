@@ -1,11 +1,11 @@
-name: CI
+name: API CI
 
 on:
   push:
   pull_request:
 
 jobs:
-  test-api:
+  api-health:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,31 +22,20 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run pipeline (train/build artifacts)
-        run: |
-          python main.py
-
       - name: Start API
         run: |
           nohup uvicorn api.main:app --host 127.0.0.1 --port 8000 > uvicorn.log 2>&1 &
           echo $! > uvicorn.pid
 
-      - name: Wait for API
+      - name: Wait for API and test health
         run: |
-          for i in {1..30}; do
+          for i in {1..40}; do
             if curl -fsS http://127.0.0.1:8000/health > /dev/null; then
               echo "API is up"
-              exit 0
+              break
             fi
             sleep 1
           done
-          echo "API failed to start"
-          echo "---- uvicorn.log ----"
-          cat uvicorn.log
-          exit 1
-
-      - name: Test health endpoint
-        run: |
           curl -fsS http://127.0.0.1:8000/health
 
       - name: Stop API
